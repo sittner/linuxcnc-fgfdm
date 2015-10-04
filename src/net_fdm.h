@@ -13,9 +13,6 @@
 #ifndef _NET_FDM_H
 #define _NET_FDM_H
 
-#include <time.h> // time_t
-#include <stdint.h>
-
 // NOTE: this file defines an external interface structure.  Due to
 // variability between platforms and architectures, we only used fixed
 // length types here.  Specifically, integer types can vary in length.
