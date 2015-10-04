@@ -1,2 +1,2 @@
-# linuxcnc-ethercat
-LinuxCNC EtherCAT HAL driver
+# linuxcnc-fgfdm
+Flightgear NetFDM to HAL driver
