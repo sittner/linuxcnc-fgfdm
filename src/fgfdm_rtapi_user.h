@@ -24,6 +24,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <sched.h>
+#include <stdint.h>
 
 static inline void *fgfdm_zalloc(size_t size) {
   void *p = malloc(size);
