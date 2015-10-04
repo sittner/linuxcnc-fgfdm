@@ -1,0 +1,17 @@
+.PHONY: all install clean
+
+all:
+	@$(MAKE) -f user.mk all
+	@$(MAKE) -f realtime.mk all
+
+install:
+	@$(MAKE) -f user.mk install
+	@$(MAKE) -f realtime.mk install
+
+clean:
+	rm -f *.so *.ko *.o
+	rm -f *.mod.c .*.cmd
+	rm -f modules.order Module.symvers
+	rm -rf .tmp_versions
+	rm -f fgfdm_lsnr
+

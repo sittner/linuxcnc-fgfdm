@@ -1,0 +1,3 @@
+obj-m += fgfdm.o
+fgfdm-objs := fgfdm_rt.o
+
