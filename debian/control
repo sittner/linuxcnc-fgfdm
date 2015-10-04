@@ -5,7 +5,7 @@ Maintainer: Sascha Ittner <sascha.ittner@modusoft.de>
 Build-Depends: debhelper (>= 8.0.0), linuxcnc-dev | linuxcnc-sim-dev | machinekit-dev
 Standards-Version: 3.9.3
 
-Package: linuxcnc-ethercat
+Package: linuxcnc-fgfdm
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, linuxcnc | linuxcnc-sim | machinekit
 Description: Flightgear NetFDM to HAL driver
