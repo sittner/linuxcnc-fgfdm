@@ -2,13 +2,17 @@
 
 all: configure
 	@$(MAKE) -C src all
+	@$(MAKE) -C comp all
 
 clean:
 	@$(MAKE) -C src clean
+	@$(MAKE) -C comp clean
 	rm -f config.mk config.mk.tmp
 
 install: configure
 	@$(MAKE) -C src install
+	@$(MAKE) -C comp install
+	@$(MAKE) -C examples install-examples
 
 configure: config.mk
 

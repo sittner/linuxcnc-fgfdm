@@ -1,0 +1,85 @@
+###########################################################
+# load components
+###########################################################
+
+loadrt trivkins
+loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[TRAJ]AXES
+
+loadusr -W lcec_conf ethercat-conf.xml
+loadrt lcec
+
+loadusr -W fgfdm_lsnr [FGFDM]LISTENING_PORT
+loadrt fgfdm
+
+loadrt fgplc
+loadrt fgipol names=pitch-ipol,roll-ipol
+loadrt fgaxis names=pitch-axis,roll-axis
+
+loadrt limit3 names=pitch-lim,roll-lim
+loadrt pid names=pitch-pid,roll-pid
+
+###########################################################
+# add funtion calls
+###########################################################
+
+addf fgfdm.read servo-thread
+
+addf lcec.read-all servo-thread
+
+addf motion-command-handler servo-thread
+addf motion-controller servo-thread
+
+addf fgplc servo-thread
+
+addf pitch-ipol servo-thread
+addf roll-ipol servo-thread
+addf pitch-axis servo-thread
+addf roll-axis servo-thread
+addf pitch-lim servo-thread
+addf roll-lim servo-thread
+
+addf pitch-pid.do-pid-calcs servo-thread
+addf roll-pid.do-pid-calcs servo-thread
+
+addf lcec.write-all servo-thread
+
+###########################################################
+# motion dummy feedback
+###########################################################
+
+net pitch-fg => axis.0.motor-pos-fb
+net roll-fg => axis.2.motor-pos-fb
+
+###########################################################
+# flightgear interconnect
+###########################################################
+
+net roll-fg <= fgfdm.pos.phi
+net pitch-fg <= fgfdm.pos.theta
+net roll-velo-fg <= fgfdm.velo.phidot
+net pitch-velo-fg <= fgfdm.velo.thetadot
+net fg-ready <= fgfdm.data-valid
+net fg-timestamp <= fgfdm.timestamp
+
+###########################################################
+# plc connections
+###########################################################
+
+net ctrl-ena <= fgplc.ctrl-ena
+net ctrl-on => fgplc.ctrl-on
+net fg-ready => fgplc.fg-ready
+net home-mode-switch => fgplc.home-mode-switch
+net simu-mode-switch => fgplc.simu-mode-switch
+net home-mode-lamp <= fgplc.home-mode-lamp
+net simu-mode-lamp <= fgplc.simu-mode-lamp
+net mode <= fgplc.mode
+net amp-enable <= fgplc.amp-enable
+net pitch-on-pos => fgplc.pitch-on-pos
+net roll-on-pos => fgplc.roll-on-pos
+net pitch-axis-ferror => fgplc.pitch-axis-ferror
+net roll-axis-ferror => fgplc.roll-axis-ferror
+net pitch-amp-fault => fgplc.pitch-amp-fault
+net roll-amp-fault => fgplc.roll-amp-fault
+net pitch-amp-ready-error <= fgplc.pitch-amp-ready-error
+net roll-amp-ready-error <= fgplc.roll-amp-ready-error
+

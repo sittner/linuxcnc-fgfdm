@@ -1,0 +1,42 @@
+component fgipol "flightgear position interpolator";
+
+pin in float pos_in;
+pin in float velo_in;
+
+pin out float pos_out;
+pin out float velo_out;
+
+pin out bit stall;
+
+param rw u32 stall_time_ms = 1000;
+param rw float pgain = 1.0;
+
+variable int64_t stall_count;
+variable double old_pos_in;
+
+function _;
+license "GPL";
+
+;;
+
+// check for position stall
+if (pos_in != old_pos_in) {
+  stall_count = stall_time_ms * 1000000LL;
+}
+old_pos_in = pos_in;
+
+// calc correction velocity
+velo_out = (pos_in - pos_out) * pgain;
+
+// pass thru velocity input if no stall
+if (stall_count > 0) {
+  stall = 0;
+  velo_out += velo_in;
+  stall_count -= period;
+} else {
+  stall = 1;
+}
+
+// update position output
+pos_out += velo_out * fperiod;
+

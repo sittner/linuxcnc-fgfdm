@@ -1,0 +1,39 @@
+###########################################################
+# digital inputs
+###########################################################
+
+net home-mode-switch <= lcec.0.1.din-0
+net simu-mode-switch <= lcec.0.1.din-1
+net ctrl-on <= lcec.0.1.din-2
+net roll-amp-ready <= lcec.0.1.din-4
+net pitch-amp-ready <= lcec.0.1.din-5
+
+###########################################################
+# digital outputs
+###########################################################
+
+net home-mode-lamp => lcec.0.2.dout-0
+net simu-mode-lamp => lcec.0.2.dout-1
+net ctrl-ena => lcec.0.2.dout-2
+net amp-enable => lcec.0.2.dout-4
+
+###########################################################
+# servo controlers
+###########################################################
+
+# pitch axis
+setp lcec.0.4.srv-pos-scale [AXIS_0]SCALE
+net amp-enable => lcec.0.4.srv-enable
+net pitch-amp-fault <= lcec.0.4.srv-error
+net pitch-vel-cmd => lcec.0.4.srv-vel-cmd
+net pitch-fb <= lcec.0.4.srv-pos-fb-rel
+net ctrl-on => lcec.0.4.srv-err-reset
+
+# roll axis
+setp lcec.0.3.srv-pos-scale [AXIS_1]SCALE
+net amp-enable => lcec.0.3.srv-enable
+net roll-amp-fault <= lcec.0.3.srv-error
+net roll-vel-cmd => lcec.0.3.srv-vel-cmd
+net roll-fb <= lcec.0.3.srv-pos-fb-rel
+net ctrl-on => lcec.0.3.srv-err-reset
+

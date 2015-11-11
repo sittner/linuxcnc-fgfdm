@@ -1,0 +1,88 @@
+component fgaxis "flightgear axis controller";
+
+param rw float home_accel = 1.0;
+param rw float home_velo = 1.0;
+param rw float home_pos = 0.0;
+
+param rw float simu_accel = 1.0;
+param rw float simu_velo = 1.0;
+
+param rw float on_pos_window = 0.5;
+param rw float ferror_window = 1.0;
+
+pin in u32 mode;
+
+pin in float lim_pos;
+pin out float lim_accel;
+pin out float lim_velo;
+pin out bit lim_load;
+
+pin in float pos_in;
+pin out float pos_out;
+pin in float pos_fb;
+
+pin in bit amp_enable;
+pin in bit amp_ready;
+pin out bit amp_ready_error;
+
+pin out bit on_pos;
+pin out bit ferror;
+
+variable int64_t amp_ready_timer;
+
+function _;
+license "GPL";
+
+;;
+
+extern double fabs(double);
+
+#define AMP_READY_TIMEOUT 1000000000LL;
+
+#define MODE_OFF  0
+#define MODE_HOME 1
+#define MODE_SIMU 2
+
+// safe default state
+pos_out = pos_fb;
+lim_accel = home_accel;
+lim_velo = home_velo;
+lim_load = 1;
+on_pos = 0;
+ferror = 0;
+amp_ready_error = 0;
+
+// reset amp ready timeout
+if (mode == MODE_OFF || !amp_enable) {
+  amp_ready_timer = AMP_READY_TIMEOUT;
+  return;
+}
+
+// check for amp ready
+if (!amp_ready) {
+  if (amp_ready_timer > 0) {
+    amp_ready_timer -= period;
+  } else {
+    amp_ready_error = 1;
+  }
+  return;
+}
+
+// pos muxer
+lim_load = 0;
+if (mode == MODE_SIMU) {
+  pos_out = pos_in;
+} else {
+  pos_out = home_pos;
+}
+
+// check position windows
+on_pos = (fabs(pos_out - lim_pos) <= on_pos_window);
+ferror = (fabs(pos_fb - pos_out) > ferror_window);
+
+// use simulation accel/velo if on-position window is ok
+if (mode == MODE_SIMU && on_pos) {
+  lim_accel = simu_accel;
+  lim_velo = simu_velo;
+}
+

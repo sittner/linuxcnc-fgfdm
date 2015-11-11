@@ -1,0 +1,161 @@
+component fgplc "flightgear simulator plc";
+
+pin out bit ctrl_ena;
+pin in bit ctrl_on;
+
+pin in bit fg_ready;
+
+pin in bit home_mode_switch;
+pin in bit simu_mode_switch;
+pin out bit home_mode_lamp;
+pin out bit simu_mode_lamp;
+
+pin out bit amp_enable;
+
+pin in bit roll_on_pos;
+pin in bit pitch_on_pos;
+
+pin in bit roll_amp_fault;
+pin in bit roll_amp_ready_error;
+pin in bit roll_axis_ferror;
+
+pin in bit pitch_amp_fault;
+pin in bit pitch_amp_ready_error;
+pin in bit pitch_axis_ferror;
+
+pin out u32 mode;
+pin out u32 error;
+
+variable int64_t mode_select_timer;
+variable int64_t amp_enable_timer;
+variable int64_t blink_timer;
+variable int blink_state;
+
+option singleton yes;
+function _;
+license "GPL";
+;;
+
+#define MODE_SELECT_TIME	100000000LL
+#define AMP_ENABLE_TIME		1000000000LL
+#define BLINK_PERIOD		250000000LL
+
+#define MODE_OFF	0
+#define MODE_HOME	1
+#define MODE_SIMU	2
+
+#define ERROR_MODE_SELECT	(1 << 0)
+#define ERROR_FG_NOT_READY	(1 << 1)
+#define ERROR_PITCH_AMP		(1 << 2)
+#define ERROR_PITCH_AMP_RDY	(1 << 3)
+#define ERROR_PITCH_FERROR	(1 << 4)
+#define ERROR_ROLL_AMP		(1 << 5)
+#define ERROR_ROLL_AMP_RDY	(1 << 6)
+#define ERROR_ROLL_FERROR	(1 << 7)
+
+// default output states
+ctrl_ena = 1;
+home_mode_lamp = 0;
+simu_mode_lamp = 0;
+amp_enable = 0;
+
+// initialize state if ctrl voltage is off
+if (!ctrl_on) {
+  amp_enable_timer = AMP_ENABLE_TIME;
+  mode_select_timer = MODE_SELECT_TIME;
+  blink_timer = 0;
+  blink_state = 0;
+  mode = MODE_OFF;
+  error = 0;
+  return;
+}
+
+// update blink state
+blink_timer += period;
+if (blink_timer >= BLINK_PERIOD) {
+  blink_timer -= BLINK_PERIOD;
+  blink_state = !blink_state;
+}
+
+// display error and exit
+if (error) {
+  simu_mode_lamp = blink_state;
+  home_mode_lamp = !blink_state;
+  mode = MODE_OFF;
+  return;
+}
+
+// mode selection
+if (home_mode_switch) {
+  mode = MODE_HOME;
+}
+if (simu_mode_switch) {
+  if (fg_ready) {
+    mode = MODE_SIMU;
+  } else {
+    error |= ERROR_FG_NOT_READY;
+  }
+}
+
+// switch to home mode if flightgear get lost
+if (mode == MODE_SIMU && !fg_ready) {
+  mode = MODE_HOME;
+}
+
+// check for mode select timeout
+if (mode == MODE_OFF) {
+  if (mode_select_timer > 0) {
+    mode_select_timer -= period;
+  } else {
+    error |= ERROR_MODE_SELECT;
+  }
+}
+
+// check for axis errors
+if (roll_amp_fault) {
+  error |= ERROR_ROLL_AMP;
+}
+if (roll_amp_ready_error) {
+  error |= ERROR_ROLL_AMP_RDY;
+}
+if (roll_axis_ferror) {
+  error |= ERROR_ROLL_FERROR;
+}
+if (pitch_amp_fault) {
+  error |= ERROR_PITCH_AMP;
+}
+if (pitch_amp_ready_error) {
+  error |= ERROR_PITCH_AMP_RDY;
+}
+if (pitch_axis_ferror) {
+  error |= ERROR_PITCH_FERROR;
+}
+
+// reset mode on error
+if (error) {
+  mode = MODE_OFF;
+  return;
+}
+
+// mode lamp status (blink if not on position)
+int mode_lamp;
+if (pitch_on_pos && roll_on_pos) {
+  mode_lamp = 1;
+} else {
+  mode_lamp = blink_state;
+}
+
+// display current mode
+if (mode == MODE_SIMU) {
+  simu_mode_lamp = mode_lamp;
+} else {
+  home_mode_lamp = mode_lamp;
+}
+
+// enable amp
+if (amp_enable_timer > 0) {
+  amp_enable_timer -= period;
+} else {
+  amp_enable = 1;
+}
+

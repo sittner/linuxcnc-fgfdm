@@ -1,0 +1,18 @@
+<masters>
+  <master idx="0" appTimePeriod="1000000" refClockSyncCycles="1000">
+    <slave idx="0" type="EK1100"/>
+    <slave idx="1" type="EL1008"/>
+    <slave idx="2" type="EL2008"/>
+    <slave idx="3" type="StMDS5k">
+      <dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="-25000"/>
+      <watchdog divider="2498" intervals="5000"/>
+    </slave>
+    <slave idx="4" type="StMDS5k">
+      <dcConf assignActivate="300" sync0Cycle="*1" sync0Shift="-25000"/>
+      <watchdog divider="2498" intervals="5000"/>
+    </slave>
+  </master>
+</masters>
+
+
+

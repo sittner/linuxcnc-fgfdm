@@ -1,0 +1,140 @@
+###########################################################
+# interpolators
+###########################################################
+
+# pitch axis
+
+setp pitch-ipol.stall-time-ms [AXIS_0]IPOL_STALL_TIME_MS
+setp pitch-ipol.pgain [AXIS_0]IPOL_PGAIN
+
+net pitch-fg => pitch-ipol.pos-in
+net pitch-velo-fg => pitch-ipol.velo-in
+net pitch-ip <= pitch-ipol.pos-out
+
+# roll axis
+
+setp roll-ipol.stall-time-ms [AXIS_1]IPOL_STALL_TIME_MS
+setp roll-ipol.pgain [AXIS_1]IPOL_PGAIN
+
+net roll-fg => roll-ipol.pos-in
+net roll-velo-fg => roll-ipol.velo-in
+net roll-ip <= roll-ipol.pos-out
+
+###########################################################
+# axis components
+###########################################################
+
+# pitch axis
+
+setp pitch-axis.home-accel [AXIS_0]HOME_ACCELERATION
+setp pitch-axis.home-velo [AXIS_0]HOME_VELOCITY
+setp pitch-axis.home-pos [AXIS_0]HOME
+setp pitch-axis.simu-accel [AXIS_0]MAX_ACCELERATION
+setp pitch-axis.simu-velo [AXIS_0]MAX_VELOCITY
+setp pitch-axis.on-pos-window [AXIS_0]MIN_FERROR
+setp pitch-axis.ferror-window [AXIS_0]FERROR
+
+net mode => pitch-axis.mode
+net pitch-cmd => pitch-axis.lim-pos
+net pitch-lim-accel <= pitch-axis.lim-accel
+net pitch-lim-velo <= pitch-axis.lim-velo
+net pitch-lim-load <= pitch-axis.lim-load
+net pitch-ip => pitch-axis.pos-in
+net pitch-req <= pitch-axis.pos-out
+net pitch-fb => pitch-axis.pos-fb
+net pitch-on-pos <= pitch-axis.on-pos
+net pitch-ferror <= pitch-axis.ferror
+net amp-enable => pitch-axis.amp-enable
+net pitch-amp-ready => pitch-axis.amp-ready
+net pitch-amp-ready-error <= pitch-axis.amp-ready-error
+net pitch-ferror <= pitch-axis.ferror
+
+# roll axis
+
+setp roll-axis.home-accel [AXIS_1]HOME_ACCELERATION
+setp roll-axis.home-velo [AXIS_1]HOME_VELOCITY
+setp roll-axis.home-pos [AXIS_1]HOME
+setp roll-axis.simu-accel [AXIS_1]MAX_ACCELERATION
+setp roll-axis.simu-velo [AXIS_1]MAX_VELOCITY
+setp roll-axis.on-pos-window [AXIS_1]MIN_FERROR
+setp roll-axis.ferror-window [AXIS_1]FERROR
+
+net mode => roll-axis.mode
+net roll-cmd => roll-axis.lim-pos
+net roll-lim-accel <= roll-axis.lim-accel
+net roll-lim-velo <= roll-axis.lim-velo
+net roll-lim-load <= roll-axis.lim-load
+net roll-ip => roll-axis.pos-in
+net roll-req <= roll-axis.pos-out
+net roll-fb => roll-axis.pos-fb
+net roll-on-pos <= roll-axis.on-pos
+net roll-ferror <= roll-axis.ferror
+net amp-enable => roll-axis.amp-enable
+net roll-amp-ready => roll-axis.amp-ready
+net roll-amp-ready-error <= roll-axis.amp-ready-error
+net roll-ferror <= roll-axis.ferror
+
+###########################################################
+# limiters
+###########################################################
+
+# pitch axis
+
+setp pitch-lim.min [AXIS_0]MIN_LIMIT
+setp pitch-lim.max [AXIS_0]MAX_LIMIT
+
+net pitch-lim-accel => pitch-lim.maxa
+net pitch-lim-velo => pitch-lim.maxv
+net pitch-lim-load => pitch-lim.load
+net pitch-req => pitch-lim.in
+net pitch-cmd <= pitch-lim.out
+
+# roll axis
+
+setp roll-lim.min [AXIS_1]MIN_LIMIT
+setp roll-lim.max [AXIS_1]MAX_LIMIT
+
+net roll-lim-accel => roll-lim.maxa
+net roll-lim-velo => roll-lim.maxv
+net roll-lim-load => roll-lim.load
+net roll-req => roll-lim.in
+net roll-cmd <= roll-lim.out
+
+###########################################################
+# position controllers
+###########################################################
+
+# pitch axis
+
+setp pitch-pid.Pgain [AXIS_0]PGAIN
+setp pitch-pid.Igain [AXIS_0]IGAIN
+setp pitch-pid.Dgain [AXIS_0]DGAIN
+setp pitch-pid.bias [AXIS_0]BIAS
+setp pitch-pid.FF0 [AXIS_0]FF0
+setp pitch-pid.FF1 [AXIS_0]FF1
+setp pitch-pid.FF2 [AXIS_0]FF2
+setp pitch-pid.deadband [AXIS_0]DEADBAND
+setp pitch-pid.maxoutput [AXIS_0]MAX_VELOCITY
+
+net amp-enable => pitch-pid.enable
+net pitch-cmd => pitch-pid.command
+net pitch-fb => pitch-pid.feedback
+net pitch-vel-cmd <= pitch-pid.output
+
+# roll axis
+
+setp roll-pid.Pgain [AXIS_1]PGAIN
+setp roll-pid.Igain [AXIS_1]IGAIN
+setp roll-pid.Dgain [AXIS_1]DGAIN
+setp roll-pid.bias [AXIS_1]BIAS
+setp roll-pid.FF0 [AXIS_1]FF0
+setp roll-pid.FF1 [AXIS_1]FF1
+setp roll-pid.FF2 [AXIS_1]FF2
+setp roll-pid.deadband [AXIS_1]DEADBAND
+setp roll-pid.maxoutput [AXIS_1]MAX_VELOCITY
+
+net amp-enable => roll-pid.enable
+net roll-cmd => roll-pid.command
+net roll-fb => roll-pid.feedback
+net roll-vel-cmd <= roll-pid.output
+
