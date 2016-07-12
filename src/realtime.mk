@@ -15,7 +15,7 @@ ifeq (,$(findstring -Wframe-larger-than=,$(EXTRA_CFLAGS)))
 endif
 
 $(module):
-	$(MAKE) EXTRA_CFLAGS="$(EXTRA_CFLAGS)" KBUILD_EXTRA_SYMBOLS="$(RTLIBDIR)/Module.symvers $(RTAIDIR)/modules/ethercat/Module.symvers" -C $(KERNELDIR) SUBDIRS=`pwd` CC=$(CC) V=0 modules
+	$(MAKE) EXTRA_CFLAGS="$(EXTRA_CFLAGS)" KBUILD_EXTRA_SYMBOLS="$(RTLIBDIR)/Module.symvers" -C $(KERNELDIR) SUBDIRS=`pwd` CC=$(CC) V=0 modules
 
 else
 
@@ -24,7 +24,7 @@ module = $(patsubst %.o,%.so,$(obj-m))
 EXTRA_CFLAGS := $(filter-out -Wframe-larger-than=%,$(EXTRA_CFLAGS))
 
 $(module): $(fgfdm-objs)
-	$(CC) -shared -o $@ $(fgfdm-objs) -Wl,-rpath,$(LIBDIR) -L$(LIBDIR) -llinuxcnchal -lethercat -lrt
+	$(CC) -shared -o $@ $(fgfdm-objs) -Wl,-rpath,$(LIBDIR) -L$(LIBDIR) -llinuxcnchal -lrt
 
 %.o: %.c
 	$(CC) -o $@ $(EXTRA_CFLAGS) -Os -c $<
